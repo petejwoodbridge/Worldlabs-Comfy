@@ -164,6 +164,8 @@ WorldLabsWorldInfo.splat_100k_url → WorldLabsDownloadAsset
 
 **Purpose:** Creates an HTML viewer file and automatically opens it in your default browser for viewing/downloading assets.
 
+**⚠️ Important:** This viewer opens in your **web browser only** - it does not display inside ComfyUI.
+
 **Inputs:**
 - `world_data` (WORLDLABS_WORLD): Output from Generate World node
 - `quality` (DROPDOWN): Choose quality level:
@@ -181,8 +183,9 @@ WorldLabsWorldInfo.splat_100k_url → WorldLabsDownloadAsset
 **Behavior:**
 - Generates HTML viewer file
 - Saves to `ComfyUI/output/worldlabs_viewers/`
-- Automatically opens in your default web browser
+- **Automatically opens in your default web browser** (not embedded in ComfyUI)
 - Prints file path to console for later access
+- HTML files are saved permanently and can be reopened anytime
 
 **For Splat Viewer:**
 - Provides "View in Marble" button (opens official World Labs viewer)
@@ -195,9 +198,10 @@ WorldLabsWorldInfo.splat_100k_url → WorldLabsDownloadAsset
 - Uses Three.js and Photo Sphere Viewer (CDN-hosted)
 
 **Tips:**
+- **Viewer opens in browser, not in ComfyUI** - this is the expected behavior
 - Use the **thumbnail output** from Generate World for static images in ComfyUI workflows
 - Splat viewer provides direct links to Marble for best 3D viewing experience
-- HTML files are saved so you can reopen them later from the output folder
+- HTML files are saved permanently and can be reopened from `output/worldlabs_viewers/`
 
 ---
 
