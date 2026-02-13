@@ -1,0 +1,261 @@
+{
+  "last_node_id": 6,
+  "last_link_id": 6,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [0, 0],
+      "size": [320, 314],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [1],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "example.png",
+        "image"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "WorldLabsAPIKey",
+      "pos": [0, 350],
+      "size": [320, 80],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "links": [2],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WorldLabsAPIKey"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 3,
+      "type": "WorldLabsGenerateWorld",
+      "pos": [370, 0],
+      "size": [400, 350],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 1
+        },
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "link": 2
+        },
+        {
+          "name": "text_prompt",
+          "type": "STRING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "world_data",
+          "type": "WORLDLABS_WORLD",
+          "links": [3, 4],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "world_id",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "marble_url",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "thumbnail",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WorldLabsGenerateWorld"
+      },
+      "widgets_values": [
+        "My ComfyUI World",
+        "Marble 0.1-mini",
+        false,
+        15,
+        600,
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 4,
+      "type": "WorldLabsWorldInfo",
+      "pos": [820, 0],
+      "size": [300, 150],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "world_data",
+          "type": "WORLDLABS_WORLD",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "name": "splat_100k_url",
+          "type": "STRING",
+          "links": null,
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "splat_500k_url",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "splat_full_url",
+          "type": "STRING",
+          "links": [5],
+          "shape": 3,
+          "slot_index": 2
+        },
+        {
+          "name": "mesh_url",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "pano_url",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WorldLabsWorldInfo"
+      }
+    },
+    {
+      "id": 5,
+      "type": "WorldLabsViewer",
+      "pos": [370, 400],
+      "size": [400, 120],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "world_data",
+          "type": "WORLDLABS_WORLD",
+          "link": 4
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "WorldLabsViewer"
+      },
+      "widgets_values": [
+        "full_res",
+        "splat"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "WorldLabsDownloadAsset",
+      "pos": [820, 200],
+      "size": [300, 130],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "asset_url",
+          "type": "STRING",
+          "link": 5
+        },
+        {
+          "name": "filename",
+          "type": "STRING",
+          "link": null
+        },
+        {
+          "name": "subfolder",
+          "type": "STRING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "file_path",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WorldLabsDownloadAsset"
+      },
+      "widgets_values": [
+        "",
+        "my_world_splat_full",
+        "worldlabs"
+      ]
+    }
+  ],
+  "links": [
+    [1, 1, 0, 3, 0, "IMAGE"],
+    [2, 2, 0, 3, 1, "STRING"],
+    [3, 3, 0, 4, 0, "WORLDLABS_WORLD"],
+    [4, 3, 0, 5, 0, "WORLDLABS_WORLD"],
+    [5, 4, 2, 6, 0, "STRING"]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1,
+      "offset": [0, 0]
+    }
+  },
+  "version": 0.4
+}
