@@ -7,9 +7,10 @@ This custom node package integrates World Labs' cutting-edge AI technology that 
 ## Features
 
 - 🖼️ **Generate 3D Worlds** from any image
-- 🎨 **Multiple Output Formats**: Gaussian splats (100k, 500k, full resolution), 3D meshes (GLB), and panoramas
-- 👁️ **Interactive 3D Viewers** built into ComfyUI using PlayCanvas SuperSplat, Three.js, and Photo Sphere Viewer
+- 🎨 **Multiple Output Formats**: Gaussian splats (.spz), 3D meshes (.glb), and panoramas
+- 🌐 **Browser Viewers** - Auto-opens HTML viewers in your browser with download links and Marble viewer integration
 - 📥 **Download Assets** directly to your ComfyUI output directory
+- 🖼️ **Thumbnail Output** - Use the thumbnail image output directly in ComfyUI workflows
 - 🔄 **Full API Integration** with progress tracking and timeout handling
 - 🔐 **Flexible API Key Management** via environment variables or node inputs
 
@@ -121,11 +122,11 @@ WorldLabsAPIKey → WorldLabsGenerateWorld
 - `world_data` (WORLDLABS_WORLD): Output from Generate World node
 
 **Outputs:**
-- `splat_100k_url` (STRING): URL for 100,000 point Gaussian splat (.ply)
-- `splat_500k_url` (STRING): URL for 500,000 point Gaussian splat (.ply)
-- `splat_full_url` (STRING): URL for full resolution Gaussian splat (.ply)
+- `splat_100k_url` (STRING): URL for 100,000 point Gaussian splat (.spz)
+- `splat_500k_url` (STRING): URL for 500,000 point Gaussian splat (.spz)
+- `splat_full_url` (STRING): URL for full resolution Gaussian splat (.spz)
 - `mesh_url` (STRING): URL for 3D mesh in GLB format
-- `pano_url` (STRING): URL for generated panorama image
+- `pano_url` (STRING): URL for generated panorama image (.webp)
 
 **Behavior:**
 - Prints all available asset URLs to the console
@@ -146,10 +147,11 @@ WorldLabsAPIKey → WorldLabsGenerateWorld
 - `file_path` (STRING): Absolute path to the downloaded file
 
 **Behavior:**
-- Automatically detects file type from URL (.ply, .glb, .png, .jpg)
+- Automatically detects file type from URL (.spz, .glb, .webp, .png, .jpg)
 - Shows download progress for large files
 - Creates subfolder if it doesn't exist
 - Files saved to: `ComfyUI/output/worldlabs/filename.ext`
+- **Note:** This node has `OUTPUT_NODE = True`, so it executes even without downstream connections
 
 **Example:**
 ```
@@ -160,7 +162,7 @@ WorldLabsWorldInfo.splat_100k_url → WorldLabsDownloadAsset
 
 ### 5. 3D Viewer (World Labs)
 
-**Purpose:** Display your generated 3D world in an interactive web viewer directly in ComfyUI.
+**Purpose:** Creates an HTML viewer file and automatically opens it in your default browser for viewing/downloading assets.
 
 **Inputs:**
 - `world_data` (WORLDLABS_WORLD): Output from Generate World node
@@ -169,26 +171,33 @@ WorldLabsWorldInfo.splat_100k_url → WorldLabsDownloadAsset
   - `500k`: Balanced quality and performance
   - `full_res`: Maximum quality (large file size)
 - `viewer_type` (DROPDOWN): Choose viewer type:
-  - `splat`: Gaussian splat viewer (PlayCanvas SuperSplat)
+  - `splat`: Gaussian splat download/viewer page
   - `mesh`: 3D mesh viewer (Three.js)
   - `panorama`: 360° panorama viewer (Photo Sphere Viewer)
 
 **Outputs:**
-- None (OUTPUT_NODE - displays in ComfyUI web UI)
+- None (OUTPUT_NODE - saves HTML and opens in browser)
 
 **Behavior:**
-- Generates interactive HTML viewer
-- Uses CDN-hosted libraries (no local installation needed)
-- Viewers support mouse/touch controls:
-  - **Left click/drag**: Rotate view
-  - **Right click/drag**: Pan camera
-  - **Scroll wheel**: Zoom in/out
+- Generates HTML viewer file
+- Saves to `ComfyUI/output/worldlabs_viewers/`
+- Automatically opens in your default web browser
+- Prints file path to console for later access
+
+**For Splat Viewer:**
+- Provides "View in Marble" button (opens official World Labs viewer)
+- Download button for .spz file
+- Copy link button to copy download URL to clipboard
+- **Note:** .spz is a proprietary format best viewed in the Marble web viewer
+
+**For Mesh/Panorama Viewers:**
+- Interactive 3D/360° viewing with mouse controls
+- Uses Three.js and Photo Sphere Viewer (CDN-hosted)
 
 **Tips:**
-- Start with `100k` quality for quick previews
-- Use `splat` viewer for best quality and performance
-- Use `mesh` viewer for solid 3D representation
-- Use `panorama` viewer to see the full 360° environment
+- Use the **thumbnail output** from Generate World for static images in ComfyUI workflows
+- Splat viewer provides direct links to Marble for best 3D viewing experience
+- HTML files are saved so you can reopen them later from the output folder
 
 ---
 
@@ -234,20 +243,29 @@ WorldLabsGenerateWorld ──┬──→ WorldLabsViewer (splat, 100k)
 
 ## Output Assets
 
-### Gaussian Splats (.ply)
-- **100k**: ~5-10 MB, fast loading, good for previews
-- **500k**: ~20-40 MB, balanced quality
-- **Full Resolution**: ~100+ MB, maximum quality
+### Gaussian Splats (.spz)
+- **100k**: ~1-2 MB, fast loading, good for previews
+- **500k**: ~5-10 MB, balanced quality
+- **Full Resolution**: ~20-50 MB, maximum quality
+- **Format:** Proprietary compressed format (.spz) by World Labs
+- **Viewing:** Best viewed in the Marble web viewer (link provided by nodes)
 
 ### 3D Mesh (.glb)
 - Industry-standard GLB format
 - Importable into Blender, Unity, Unreal Engine, etc.
 - Includes textures and materials
+- Can be viewed in the built-in Three.js viewer
 
-### Panorama (.png)
+### Panorama (.webp)
 - 360° equirectangular panorama
-- High resolution
+- High resolution WebP format
+- Viewable in the built-in Photo Sphere viewer
 - Usable in VR applications
+
+### Thumbnail (IMAGE)
+- Preview image returned directly as ComfyUI IMAGE type
+- Use this for static images in your workflows
+- No need for download - already available as a node output
 
 ## Troubleshooting
 
@@ -271,11 +289,18 @@ If world generation times out:
 - Verify you have API credits remaining
 - Check World Labs API status
 
-### Viewer Not Loading
+### Viewer Not Opening in Browser
 
-- Ensure you have an active internet connection (viewers use CDN libraries)
-- Try a different quality level
-- Check browser console for errors
+- Check if popup blockers are preventing the browser from opening
+- Manually open the HTML file from `ComfyUI/output/worldlabs_viewers/`
+- Console will print the file path if auto-open fails
+
+### Splat Viewer Shows Download Links Only
+
+- This is expected behavior! .spz files use a proprietary format
+- Click "View in Marble" to see your world in the official viewer
+- Use the Download Asset node to save .spz files locally
+- Use the **thumbnail** output for static images in ComfyUI workflows
 
 ### Download Fails
 
@@ -285,12 +310,14 @@ If world generation times out:
 
 ## Tips & Best Practices
 
-1. **Start Small**: Test with `Marble 0.1-mini` before using `Marble 0.1-plus`
-2. **Input Images**: Works best with clear, well-lit images with good depth cues
-3. **Panoramas**: For 360° input images, set `is_panorama` to true
-4. **Text Prompts**: Add descriptive text prompts to guide generation
-5. **Quality Settings**: Use `100k` quality for quick previews, `full_res` for final outputs
-6. **Caching**: World data is preserved in the workflow - you can change viewer settings without regenerating
+1. **Use Thumbnails for Images**: The `thumbnail` output from Generate World provides a static image you can use directly in ComfyUI workflows - no need to screenshot!
+2. **Start Small**: Test with `Marble 0.1-mini` before using `Marble 0.1-plus`
+3. **Input Images**: Works best with clear, well-lit images with good depth cues
+4. **Panoramas**: For 360° input images, set `is_panorama` to true
+5. **Text Prompts**: Add descriptive text prompts to guide generation
+6. **Quality Settings**: Use `100k` quality for quick previews, `full_res` for final outputs
+7. **Caching**: World data is preserved in the workflow - you can change viewer/download settings without regenerating
+8. **Viewing Splats**: Use the "View in Marble" button for the best interactive 3D experience with .spz files
 
 ## API Documentation
 
@@ -312,14 +339,16 @@ MIT License - see LICENSE file for details.
 - Initial release
 - Complete API integration
 - 5 nodes: API Key, Generate World, World Info, Download Asset, 3D Viewer
-- Support for all World Labs output formats
-- Interactive web viewers using CDN libraries
+- Support for all World Labs output formats (.spz, .glb, .webp)
+- Browser-based viewers with auto-open functionality
+- Thumbnail output for direct use in ComfyUI workflows
+- Download Asset node with OUTPUT_NODE for automatic execution
+- Marble viewer integration for optimal .spz viewing
 
 ## Credits
 
-- **World Labs**: For the amazing Marble API
+- **World Labs**: For the amazing Marble API and .spz format
 - **ComfyUI**: For the powerful node-based interface
-- **PlayCanvas SuperSplat**: Gaussian splat viewer
 - **Three.js**: 3D mesh rendering
 - **Photo Sphere Viewer**: Panorama viewer
 
